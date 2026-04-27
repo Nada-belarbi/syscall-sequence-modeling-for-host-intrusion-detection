@@ -1,0 +1,4 @@
+metric,value
+stable_delete_rate,0.9898911353032659
+stable_noise_rate,0.9805598755832037
+stable_both_rate,0.9727838258164853

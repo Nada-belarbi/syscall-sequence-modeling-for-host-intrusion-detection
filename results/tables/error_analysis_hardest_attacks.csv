@@ -1,0 +1,13 @@
+model,attack_family,recall_attack_family,count
+lstm_post_e128_h128_d0.1,Adduser,0.5714285714285714,28.0
+lstm_post_e128_h128_d0.1,Web_Shell,0.8076923076923077,26.0
+lstm_post_e128_h128_d0.1,Meterpreter,0.8333333333333334,12.0
+lstm_post_e128_h128_d0.1,Hydra_FTP,0.9428571428571428,35.0
+lstm_post_e128_h128_d0.1,Java_Meterpreter,0.9615384615384616,26.0
+lstm_post_e128_h128_d0.1,Hydra_SSH,0.9736842105263158,38.0
+rf_tfidf,Adduser,0.6428571428571429,28.0
+rf_tfidf,Java_Meterpreter,0.9615384615384616,26.0
+rf_tfidf,Hydra_SSH,0.9736842105263158,38.0
+rf_tfidf,Hydra_FTP,1.0,35.0
+rf_tfidf,Meterpreter,1.0,12.0
+rf_tfidf,Web_Shell,1.0,26.0

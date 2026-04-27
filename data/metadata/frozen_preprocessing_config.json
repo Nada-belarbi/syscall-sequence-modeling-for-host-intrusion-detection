@@ -1,0 +1,114 @@
+{
+  "generated_at": "2026-04-18T12:45:04.802033Z",
+  "protocol_used": "protocol_a_main",
+  "heldout_families": [
+    "Web_Shell",
+    "Meterpreter"
+  ],
+  "max_len_choice_summary": {
+    "selected_strategy": "p95_train",
+    "selected_max_len": 1231,
+    "p95": 1231,
+    "p99": 1760,
+    "fixed_max_len": 512
+  },
+  "truncation_choice": "dual_view_post_pre",
+  "vocab_size": 152,
+  "fit_checks": [
+    {
+      "check": "vocab_built_only_on_train",
+      "value": true
+    },
+    {
+      "check": "tfidf_fit_only_on_train",
+      "value": true
+    },
+    {
+      "check": "bigram_fit_only_on_train",
+      "value": true
+    },
+    {
+      "check": "fit_scope_flag",
+      "value": true
+    }
+  ],
+  "feature_dims": [
+    {
+      "feature_set": "BoW",
+      "train_shape": [
+        1766,
+        150
+      ],
+      "val_shape": [
+        2899,
+        150
+      ],
+      "test_shape": [
+        1286,
+        150
+      ]
+    },
+    {
+      "feature_set": "TF-IDF",
+      "train_shape": [
+        1766,
+        150
+      ],
+      "val_shape": [
+        2899,
+        150
+      ],
+      "test_shape": [
+        1286,
+        150
+      ]
+    },
+    {
+      "feature_set": "Bigram",
+      "train_shape": [
+        1766,
+        2538
+      ],
+      "val_shape": [
+        2899,
+        2538
+      ],
+      "test_shape": [
+        1286,
+        2538
+      ]
+    }
+  ],
+  "trunc_rate_by_split": [
+    {
+      "split": "test",
+      "truncated_rate_pct": 15.707620528771384
+    },
+    {
+      "split": "train",
+      "truncated_rate_pct": 5.0396375990939974
+    },
+    {
+      "split": "val",
+      "truncated_rate_pct": 8.416695412211107
+    }
+  ],
+  "padding_rate_by_split": [
+    {
+      "split": "test",
+      "padding_ratio_post": 59.708628698992975,
+      "padding_ratio_pre": 59.708628698992975
+    },
+    {
+      "split": "train",
+      "padding_ratio_post": 73.08985595778368,
+      "padding_ratio_pre": 73.08985595778368
+    },
+    {
+      "split": "val",
+      "padding_ratio_post": 66.44544506649397,
+      "padding_ratio_pre": 66.44544506649397
+    }
+  ],
+  "encoding_version": "protocol_a_main_ml1231_dualview_v1"
+}

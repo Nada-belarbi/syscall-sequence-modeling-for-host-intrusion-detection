@@ -1,0 +1,4 @@
+topic,note
+distribution_shift,Perturbations are synthetic and may not represent all real attack drifts.
+sequence_editing,Deletion/substitution does not model insertion or reordering explicitly.
+single_dataset,Conclusions are currently limited to ADFA-LD.

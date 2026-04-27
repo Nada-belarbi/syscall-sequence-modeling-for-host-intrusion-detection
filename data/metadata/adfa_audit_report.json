@@ -1,0 +1,133 @@
+{
+  "num_samples": 5951,
+  "num_by_label": {
+    "normal": 5205,
+    "attack": 746
+  },
+  "num_by_source_split": {
+    "val_normal": 4372,
+    "train_normal": 833,
+    "attack": 746
+  },
+  "num_by_split": {
+    "val": 2899,
+    "train": 1766,
+    "test": 1286
+  },
+  "num_by_attack_family": {
+    "Hydra_SSH": 176,
+    "Hydra_FTP": 162,
+    "Java_Meterpreter": 124,
+    "Web_Shell": 118,
+    "Adduser": 91,
+    "Meterpreter": 75
+  },
+  "length_stats": {
+    "min": 75,
+    "max": 4494,
+    "mean": 461.6955133590993,
+    "median": 343.0,
+    "p90": 1136.0,
+    "p95": 1576.0,
+    "p99": 2758.5
+  },
+  "num_empty_sequences": 0,
+  "num_parse_errors": 0,
+  "leakage_checks": {
+    "duplicate_trace_id": 0,
+    "duplicate_sha1": 2099,
+    "sha1_shared_across_splits": 0,
+    "family_split_table": [
+      {
+        "split": "test",
+        "attack_family": "Adduser",
+        "count": 28
+      },
+      {
+        "split": "test",
+        "attack_family": "Hydra_FTP",
+        "count": 35
+      },
+      {
+        "split": "test",
+        "attack_family": "Hydra_SSH",
+        "count": 38
+      },
+      {
+        "split": "test",
+        "attack_family": "Java_Meterpreter",
+        "count": 26
+      },
+      {
+        "split": "test",
+        "attack_family": "Meterpreter",
+        "count": 12
+      },
+      {
+        "split": "test",
+        "attack_family": "Web_Shell",
+        "count": 26
+      },
+      {
+        "split": "train",
+        "attack_family": "Adduser",
+        "count": 56
+      },
+      {
+        "split": "train",
+        "attack_family": "Hydra_FTP",
+        "count": 115
+      },
+      {
+        "split": "train",
+        "attack_family": "Hydra_SSH",
+        "count": 119
+      },
+      {
+        "split": "train",
+        "attack_family": "Java_Meterpreter",
+        "count": 86
+      },
+      {
+        "split": "train",
+        "attack_family": "Meterpreter",
+        "count": 56
+      },
+      {
+        "split": "train",
+        "attack_family": "Web_Shell",
+        "count": 78
+      },
+      {
+        "split": "val",
+        "attack_family": "Adduser",
+        "count": 7
+      },
+      {
+        "split": "val",
+        "attack_family": "Hydra_FTP",
+        "count": 12
+      },
+      {
+        "split": "val",
+        "attack_family": "Hydra_SSH",
+        "count": 19
+      },
+      {
+        "split": "val",
+        "attack_family": "Java_Meterpreter",
+        "count": 12
+      },
+      {
+        "split": "val",
+        "attack_family": "Meterpreter",
+        "count": 7
+      },
+      {
+        "split": "val",
+        "attack_family": "Web_Shell",
+        "count": 14
+      }
+    ]
+  }
+}

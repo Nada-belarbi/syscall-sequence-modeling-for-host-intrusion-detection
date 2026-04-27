@@ -1,0 +1,102 @@
+project:
+  name: syscall-anomaly-detection
+  seed: 42
+  label_mode: binary
+
+paths:
+  raw_adfa_root: data/raw/adfa-ld
+  metadata_root: data/metadata
+  processed_root: data/processed
+  experiment_log: results/logs/experiments.csv
+
+protocols:
+  main:
+    name: protocol_a_main
+    description: "Train on attack scenarios 1-7, validate on scenario 8, test on scenarios 9-10"
+    validation_normal_ratio: 0.5
+  baseline_binary:
+    name: protocol_b_baseline_binary
+    train_size: 0.7
+    val_size: 0.15
+  heldout_families:
+    name: protocol_c_heldout_family
+    families: [Web_Shell, Meterpreter]
+  cv_by_scenario:
+    name: protocol_cv_by_scenario
+    folds: [1,2,3,4,5,6,7,8,9,10]
+
+preprocessing:
+  strict_parsing: true
+  min_length: 1
+  truncation_candidates: [0.90, 0.95, 0.99]
+  primary_length_quantile: 0.95
+  truncation_primary: post
+  truncation_secondary: pre
+  padding: post
+
+encoding:
+  sequence:
+    min_freq: 1
+    max_vocab_size: null
+  baseline:
+    bow: true
+    tfidf: true
+    bigram: true
+
+training:
+  batch_size: 64
+  num_workers: 0
+  optimizer: adamw
+  lr: 0.001
+  weight_decay: 0.0001
+  grad_clip: 1.0
+  early_stopping_patience: 5
+
+baseline_models:
+  logistic_regression:
+    enabled: true
+    max_iter: 2000
+  random_forest:
+    enabled: true
+    n_estimators: 400
+
+lstm:
+  enabled: true
+  processed_version: protocol_a_main_ml1231_dualview_v1
+  max_len_source: p95_train
+  views: [post, pre]
+  model:
+    bidirectional: true
+    use_attention: true
+    num_layers: 2
+  ablation:
+    embedding_dims: [64, 128]
+    hidden_sizes: [128, 256]
+    dropouts: [0.1, 0.3, 0.5]
+    targeted_search: false
+  num_epochs: 20
+
+imbalance:
+  use_pos_weight: true
+  use_weighted_sampler: true
+
+threshold_optimization:
+  enabled: true
+  metric: f1
+  max_fpr: null
+
+evaluation:
+  threshold: 0.5
+  metrics:
+    - accuracy
+    - precision
+    - recall
+    - f1
+    - roc_auc
+    - pr_auc
+    - fpr
+    - fnr
+
+robustness:
+  local_deletion_ratio: 0.10
+  substitution_ratio: 0.05

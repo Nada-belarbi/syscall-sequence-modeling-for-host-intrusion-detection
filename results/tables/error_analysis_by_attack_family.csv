@@ -1,0 +1,13 @@
+model,attack_family,count,error_rate
+lstm_post_e128_h128_d0.1,Adduser,28.0,0.42857142857142855
+lstm_post_e128_h128_d0.1,Web_Shell,26.0,0.19230769230769232
+lstm_post_e128_h128_d0.1,Meterpreter,12.0,0.16666666666666666
+lstm_post_e128_h128_d0.1,Hydra_FTP,35.0,0.05714285714285714
+lstm_post_e128_h128_d0.1,Java_Meterpreter,26.0,0.038461538461538464
+lstm_post_e128_h128_d0.1,Hydra_SSH,38.0,0.02631578947368421
+rf_tfidf,Adduser,28.0,0.35714285714285715
+rf_tfidf,Java_Meterpreter,26.0,0.038461538461538464
+rf_tfidf,Hydra_SSH,38.0,0.02631578947368421
+rf_tfidf,Hydra_FTP,35.0,0.0
+rf_tfidf,Meterpreter,12.0,0.0
+rf_tfidf,Web_Shell,26.0,0.0
