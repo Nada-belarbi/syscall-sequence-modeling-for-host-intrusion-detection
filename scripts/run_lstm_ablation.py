@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+# ruff: noqa: E402
+
 from pathlib import Path
 import sys
 
@@ -19,10 +21,18 @@ from src.evaluate import build_prediction_frame, evaluate_lstm_classifier  # noq
 from src.lstm_model import LSTMClassifier  # noqa: E402
 from src.metrics import save_confusion_matrix_plot  # noqa: E402
 from src.train import fit_lstm  # noqa: E402
-from src.utils import RESULTS_ROOT, PROCESSED_ROOT, append_experiment_log, ensure_dir, set_seed  # noqa: E402
+from src.utils import (
+    RESULTS_ROOT,
+    PROCESSED_ROOT,
+    append_experiment_log,
+    ensure_dir,
+    set_seed,
+)  # noqa: E402
 
 
-def build_split_pack(index_df: pd.DataFrame, seq_post: np.ndarray, seq_pre: np.ndarray, view_name: str) -> dict[str, dict[str, object]]:
+def build_split_pack(
+    index_df: pd.DataFrame, seq_post: np.ndarray, seq_pre: np.ndarray, view_name: str
+) -> dict[str, dict[str, object]]:
     if view_name == "post":
         seq_array = seq_post
     elif view_name == "pre":
@@ -36,7 +46,9 @@ def build_split_pack(index_df: pd.DataFrame, seq_post: np.ndarray, seq_pre: np.n
     else:
         effective_len_col = "len_after_pre"
     if effective_len_col not in df.columns:
-        raise ValueError(f"Missing required column for variable-length reconstruction: {effective_len_col}")
+        raise ValueError(
+            f"Missing required column for variable-length reconstruction: {effective_len_col}"
+        )
 
     lengths = df[effective_len_col].fillna(0).astype(int).tolist()
     encoded = []
@@ -56,7 +68,12 @@ def build_split_pack(index_df: pd.DataFrame, seq_post: np.ndarray, seq_pre: np.n
     return split_pack
 
 
-def make_loaders(split_pack: dict[str, dict[str, object]], pad_value: int, batch_size: int, num_workers: int) -> dict[str, torch.utils.data.DataLoader]:
+def make_loaders(
+    split_pack: dict[str, dict[str, object]],
+    pad_value: int,
+    batch_size: int,
+    num_workers: int,
+) -> dict[str, torch.utils.data.DataLoader]:
     loaders: dict[str, torch.utils.data.DataLoader] = {}
     for split in ["train", "val", "test"]:
         ds = SyscallSequenceDataset(
@@ -76,7 +93,9 @@ def make_loaders(split_pack: dict[str, dict[str, object]], pad_value: int, batch
     return loaders
 
 
-def _subset_split_block(block: dict[str, object], cap: int, rng: np.random.Generator) -> dict[str, object]:
+def _subset_split_block(
+    block: dict[str, object], cap: int, rng: np.random.Generator
+) -> dict[str, object]:
     n = len(block["y"])
     if n <= cap:
         return block
@@ -96,7 +115,9 @@ def main() -> None:
         cfg = yaml.safe_load(f)
 
     seed = int(cfg.get("project", {}).get("seed", 42))
-    protocol_name = str(cfg.get("protocols", {}).get("main", {}).get("name", "protocol_a_main"))
+    protocol_name = str(
+        cfg.get("protocols", {}).get("main", {}).get("name", "protocol_a_main")
+    )
     set_seed(seed)
     torch.manual_seed(seed)
 
@@ -105,7 +126,11 @@ def main() -> None:
     seq_post_path = version_dir / "adfa_sequences_post.npy"
     seq_pre_path = version_dir / "adfa_sequences_pre.npy"
 
-    if not index_path.exists() or not seq_post_path.exists() or not seq_pre_path.exists():
+    if (
+        not index_path.exists()
+        or not seq_post_path.exists()
+        or not seq_pre_path.exists()
+    ):
         raise FileNotFoundError("Missing processed inputs for LSTM ablation")
 
     index_df = pd.read_parquet(index_path)
@@ -123,9 +148,9 @@ def main() -> None:
     lstm_cfg = cfg.get("lstm", {})
     views = lstm_cfg.get("views", ["post", "pre"])
     ablation_cfg = lstm_cfg.get("ablation", {})
-    emb_dims  = ablation_cfg.get("embedding_dims", [64, 128])
+    emb_dims = ablation_cfg.get("embedding_dims", [64, 128])
     hid_sizes = ablation_cfg.get("hidden_sizes", [128, 256])
-    dropouts  = ablation_cfg.get("dropouts", [0.1, 0.3, 0.5])
+    dropouts = ablation_cfg.get("dropouts", [0.1, 0.3, 0.5])
     ablation_configs = [
         {"embedding_dim": e, "hidden_size": h, "dropout": d}
         for e in emb_dims
@@ -133,13 +158,13 @@ def main() -> None:
         for d in dropouts
     ]
 
-    model_cfg   = lstm_cfg.get("model", {})
-    bidirectional  = bool(model_cfg.get("bidirectional", True))
-    use_attention  = bool(model_cfg.get("use_attention", True))
+    model_cfg = lstm_cfg.get("model", {})
+    bidirectional = bool(model_cfg.get("bidirectional", True))
+    use_attention = bool(model_cfg.get("use_attention", True))
     num_layers_cfg = int(model_cfg.get("num_layers", 2))
 
-    num_epochs   = int(lstm_cfg.get("num_epochs", 20))
-    lr           = float(training_cfg.get("lr", 1e-3))
+    num_epochs = int(lstm_cfg.get("num_epochs", 20))
+    lr = float(training_cfg.get("lr", 1e-3))
     weight_decay = float(training_cfg.get("weight_decay", 1e-4))
 
     ckpt_dir = ensure_dir(RESULTS_ROOT / "logs" / "checkpoints")
@@ -162,14 +187,30 @@ def main() -> None:
             emb_dim = int(cfg_run["embedding_dim"])
             hid_size = int(cfg_run["hidden_size"])
             dropout = float(cfg_run["dropout"])
-            split_pack = build_split_pack(index_df=index_df, seq_post=seq_post, seq_pre=seq_pre, view_name=view_name)
+            split_pack = build_split_pack(
+                index_df=index_df,
+                seq_post=seq_post,
+                seq_pre=seq_pre,
+                view_name=view_name,
+            )
 
             search_pack = {
-                "train": _subset_split_block(split_pack["train"], cap=search_train_cap, rng=subset_rng),
-                "val": _subset_split_block(split_pack["val"], cap=search_val_cap, rng=subset_rng),
-                "test": _subset_split_block(split_pack["test"], cap=search_test_cap, rng=subset_rng),
+                "train": _subset_split_block(
+                    split_pack["train"], cap=search_train_cap, rng=subset_rng
+                ),
+                "val": _subset_split_block(
+                    split_pack["val"], cap=search_val_cap, rng=subset_rng
+                ),
+                "test": _subset_split_block(
+                    split_pack["test"], cap=search_test_cap, rng=subset_rng
+                ),
             }
-            loaders = make_loaders(split_pack=search_pack, pad_value=pad_value, batch_size=batch_size, num_workers=num_workers)
+            loaders = make_loaders(
+                split_pack=search_pack,
+                pad_value=pad_value,
+                batch_size=batch_size,
+                num_workers=num_workers,
+            )
 
             run_name = f"lstm_{view_name}_e{emb_dim}_h{hid_size}_d{dropout}"
             ckpt_path = ckpt_dir / f"{run_name}.pt"
@@ -195,7 +236,9 @@ def main() -> None:
                 device=device,
                 checkpoint_path=ckpt_path,
                 grad_clip=float(training_cfg.get("grad_clip", 1.0)),
-                early_stopping_patience=int(training_cfg.get("early_stopping_patience", 5)),
+                early_stopping_patience=int(
+                    training_cfg.get("early_stopping_patience", 5)
+                ),
             )
             if history:
                 history_rows.append(pd.DataFrame(history).assign(run_name=run_name))
@@ -274,13 +317,25 @@ def main() -> None:
                     "view_for_best": view_name,
                 }
 
-            print(f"[done] {run_name} val_f1={val_f1:.4f} test_f1={float(test_eval['metrics']['f1']):.4f}")
+            print(
+                f"[done] {run_name} val_f1={val_f1:.4f} test_f1={float(test_eval['metrics']['f1']):.4f}"
+            )
 
     if best_run is None:
         raise RuntimeError("No LSTM run completed")
 
-    best_split_pack = build_split_pack(index_df=index_df, seq_post=seq_post, seq_pre=seq_pre, view_name=str(best_run["view_for_best"]))
-    best_full_loaders = make_loaders(split_pack=best_split_pack, pad_value=pad_value, batch_size=batch_size, num_workers=num_workers)
+    best_split_pack = build_split_pack(
+        index_df=index_df,
+        seq_post=seq_post,
+        seq_pre=seq_pre,
+        view_name=str(best_run["view_for_best"]),
+    )
+    best_full_loaders = make_loaders(
+        split_pack=best_split_pack,
+        pad_value=pad_value,
+        batch_size=batch_size,
+        num_workers=num_workers,
+    )
 
     best_model = LSTMClassifier(
         vocab_size=vocab_size,
@@ -297,17 +352,27 @@ def main() -> None:
     best_model = best_model.to(device)
     best_model.eval()
 
-    best_val_eval_full = evaluate_lstm_classifier(best_model, best_full_loaders["val"], device=device)
-    best_test_eval_full = evaluate_lstm_classifier(best_model, best_full_loaders["test"], device=device)
+    best_val_eval_full = evaluate_lstm_classifier(
+        best_model, best_full_loaders["val"], device=device
+    )
+    best_test_eval_full = evaluate_lstm_classifier(
+        best_model, best_full_loaders["test"], device=device
+    )
     best_run["val_eval"] = best_val_eval_full
     best_run["test_eval"] = best_test_eval_full
     best_run["test_trace_ids"] = best_full_loaders["test"].dataset.sample_ids
 
-    ablation_df = pd.DataFrame(rows).sort_values(["split", "f1"], ascending=[True, False]).reset_index(drop=True)
+    ablation_df = (
+        pd.DataFrame(rows)
+        .sort_values(["split", "f1"], ascending=[True, False])
+        .reset_index(drop=True)
+    )
     ablation_path = tables_dir / "lstm_ablation_results.csv"
     ablation_df.to_csv(ablation_path, index=False)
 
-    history_df = pd.concat(history_rows, ignore_index=True) if history_rows else pd.DataFrame()
+    history_df = (
+        pd.concat(history_rows, ignore_index=True) if history_rows else pd.DataFrame()
+    )
     history_path = tables_dir / "lstm_training_history.csv"
     history_df.to_csv(history_path, index=False)
 
@@ -337,21 +402,35 @@ def main() -> None:
         "embedding_dim": int(best_run["embedding_dim"]),
         "hidden_size": int(best_run["hidden_size"]),
         "dropout": float(best_run["dropout"]),
-        "checkpoint_path": str(Path(best_run["checkpoint_path"]).relative_to(PROJECT_ROOT)),
+        "checkpoint_path": str(
+            Path(best_run["checkpoint_path"]).relative_to(PROJECT_ROOT)
+        ),
     }
-    best_summary_row.update({f"val_{k}": v for k, v in best_run["val_eval"]["metrics"].items()})
-    best_summary_row.update({f"test_{k}": v for k, v in best_run["test_eval"]["metrics"].items()})
+    best_summary_row.update(
+        {f"val_{k}": v for k, v in best_run["val_eval"]["metrics"].items()}
+    )
+    best_summary_row.update(
+        {f"test_{k}": v for k, v in best_run["test_eval"]["metrics"].items()}
+    )
     best_summary_path = tables_dir / "lstm_best_run_summary.csv"
     pd.DataFrame([best_summary_row]).to_csv(best_summary_path, index=False)
 
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    plot_val = ablation_df[ablation_df["split"] == "val"].sort_values("f1", ascending=False).head(8)
+    plot_val = (
+        ablation_df[ablation_df["split"] == "val"]
+        .sort_values("f1", ascending=False)
+        .head(8)
+    )
     sns.barplot(data=plot_val, x="model", y="f1", hue="view", ax=axes[0])
     axes[0].set_title("Top LSTM runs on validation (F1)")
     axes[0].tick_params(axis="x", rotation=60)
     axes[0].set_ylim(0, 1)
 
-    plot_test = ablation_df[ablation_df["split"] == "test"].sort_values("f1", ascending=False).head(8)
+    plot_test = (
+        ablation_df[ablation_df["split"] == "test"]
+        .sort_values("f1", ascending=False)
+        .head(8)
+    )
     sns.barplot(data=plot_test, x="model", y="f1", hue="view", ax=axes[1])
     axes[1].set_title("Top LSTM runs on test (F1)")
     axes[1].tick_params(axis="x", rotation=60)

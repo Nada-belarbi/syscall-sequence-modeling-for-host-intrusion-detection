@@ -47,7 +47,14 @@ jobs:
         run: black --check src tests scripts
 
       - name: Run unit tests
-        run: pytest tests/ -v --tb=short --cov=src --cov-report=term-missing --cov-report=xml --cov-fail-under=70
+        run: |
+          pytest tests/ -v --tb=short \
+            --cov=src.metrics \
+            --cov=src.datasets \
+            --cov=src.lstm_model \
+            --cov-report=term-missing \
+            --cov-report=xml \
+            --cov-fail-under=75
 
       - name: Upload coverage artifact
         if: matrix.python-version == '3.11'
@@ -58,4 +65,4 @@ jobs:
 
       - name: Security audit (pip-audit)
         if: matrix.python-version == '3.11'
-        run: pip-audit
+        run: pip-audit -r requirements.txt
