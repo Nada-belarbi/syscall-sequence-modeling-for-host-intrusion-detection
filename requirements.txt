@@ -7,5 +7,5 @@ jupyter==1.1.1
 torch==2.10.0
 tqdm==4.67.1
 scipy==1.13.1
-pyarrow==21.0.0
+pyarrow==24.0.0
 pyyaml==6.0.2
