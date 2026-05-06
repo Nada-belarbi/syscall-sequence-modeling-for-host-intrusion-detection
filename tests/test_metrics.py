@@ -1,4 +1,5 @@
 """Unit tests for src/metrics.py"""
+
 from __future__ import annotations
 
 import pytest

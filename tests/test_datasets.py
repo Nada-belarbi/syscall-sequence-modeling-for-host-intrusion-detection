@@ -1,4 +1,5 @@
 """Unit tests for src/datasets.py"""
+
 from __future__ import annotations
 
 import torch
@@ -10,10 +11,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from src.datasets import SyscallSequenceDataset, make_dataloader
 
-
-_SEQS   = [[1, 2, 3], [4, 5], [6, 7, 8, 9], [10]]
+_SEQS = [[1, 2, 3], [4, 5], [6, 7, 8, 9], [10]]
 _LABELS = [0, 1, 1, 0]
-_IDS    = ["t1", "t2", "t3", "t4"]
+_IDS = ["t1", "t2", "t3", "t4"]
 
 
 def test_dataset_length():
@@ -33,7 +33,7 @@ def test_dataloader_batch_shape():
     ds = SyscallSequenceDataset(_SEQS, _LABELS, _IDS)
     loader = make_dataloader(ds, batch_size=4, shuffle=False, pad_value=0)
     batch = next(iter(loader))
-    assert batch["input_ids"].shape[0] == 4        # batch size
+    assert batch["input_ids"].shape[0] == 4  # batch size
     assert batch["input_ids"].shape[1] == max(len(s) for s in _SEQS)  # padded to max
 
 
