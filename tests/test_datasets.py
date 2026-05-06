@@ -1,7 +1,6 @@
 """Unit tests for src/datasets.py"""
 from __future__ import annotations
 
-import pytest
 import torch
 
 import sys

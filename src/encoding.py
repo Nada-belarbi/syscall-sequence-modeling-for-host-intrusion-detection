@@ -4,7 +4,6 @@ from collections import Counter
 from typing import Iterable
 
 import numpy as np
-from scipy import sparse
 from scipy.sparse import csr_matrix
 from sklearn.feature_extraction.text import TfidfTransformer
 

@@ -13,9 +13,9 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from src.data_loading import enforce_sha1_disjoint_splits, split_overlap_counts
-from src.encoding import PAD_TOKEN, build_baseline_feature_sets, build_vocab, encode_sequence
-from src.preprocessing import filter_invalid_sequences, pad_or_truncate, sanitize_sequence
+from src.data_loading import enforce_sha1_disjoint_splits, split_overlap_counts  # noqa: E402
+from src.encoding import PAD_TOKEN, build_baseline_feature_sets, build_vocab, encode_sequence  # noqa: E402
+from src.preprocessing import filter_invalid_sequences, pad_or_truncate, sanitize_sequence  # noqa: E402
 
 
 def main() -> None:

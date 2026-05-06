@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-import json
 import sys
 
 import matplotlib.pyplot as plt
@@ -15,12 +14,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.append(str(PROJECT_ROOT))
 
-from src.datasets import SyscallSequenceDataset, make_dataloader
-from src.evaluate import build_prediction_frame, evaluate_lstm_classifier
-from src.lstm_model import LSTMClassifier
-from src.metrics import save_confusion_matrix_plot
-from src.train import fit_lstm
-from src.utils import RESULTS_ROOT, PROCESSED_ROOT, append_experiment_log, ensure_dir, set_seed
+from src.datasets import SyscallSequenceDataset, make_dataloader  # noqa: E402
+from src.evaluate import build_prediction_frame, evaluate_lstm_classifier  # noqa: E402
+from src.lstm_model import LSTMClassifier  # noqa: E402
+from src.metrics import save_confusion_matrix_plot  # noqa: E402
+from src.train import fit_lstm  # noqa: E402
+from src.utils import RESULTS_ROOT, PROCESSED_ROOT, append_experiment_log, ensure_dir, set_seed  # noqa: E402
 
 
 def build_split_pack(index_df: pd.DataFrame, seq_post: np.ndarray, seq_pre: np.ndarray, view_name: str) -> dict[str, dict[str, object]]:
