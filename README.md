@@ -1,5 +1,7 @@
 # System Call-Based Intrusion Detection with Sequence Modeling on ADFA-LD
 
+[![CI](https://github.com/Nada-belarbi/test/actions/workflows/ci.yml/badge.svg)](https://github.com/Nada-belarbi/test/actions/workflows/ci.yml)
+
 This repository implements an end-to-end intrusion detection pipeline on ADFA-LD using:
 
 - Classical baselines: Logistic Regression and Random Forest on BoW/TF-IDF/bigrams.
@@ -19,6 +21,7 @@ This repository implements an end-to-end intrusion detection pipeline on ADFA-LD
 - `notebooks/03_baseline_models.ipynb`: baseline training/evaluation.
 - `notebooks/04_lstm_model.ipynb`: LSTM ablation and best-model export.
 - `notebooks/05_error_analysis.ipynb`: error analysis + robustness.
+- `notebooks/06_attack_variation_experiments.ipynb`: cross-model comparison — recall by attack family/scenario, error by sequence length, LSTM robustness under perturbations, and final summary table.
 - `results/tables`: CSV result tables.
 - `results/confusion_matrices`: confusion matrix figures.
 - `reports/figures`: exported plots.
@@ -60,6 +63,7 @@ pip install numpy pandas scipy scikit-learn matplotlib seaborn pyarrow pyyaml to
 3. `03_baseline_models.ipynb`
 4. `04_lstm_model.ipynb`
 5. `05_error_analysis.ipynb`
+6. `06_attack_variation_experiments.ipynb`
 
 If notebook execution is unstable in UI, run the LSTM batch script:
 
@@ -92,6 +96,19 @@ Expected figures:
 - `reports/figures/baseline_f1_comparison.png`
 - `reports/figures/lstm_ablation_f1_top8.png`
 - `reports/figures/error_analysis_and_robustness_summary.png`
+- `reports/figures/attack_variation_recall_by_family.png`
+- `reports/figures/attack_variation_error_by_scenario.png`
+- `reports/figures/attack_variation_error_by_length.png`
+- `reports/figures/attack_variation_robustness.png`
+
+## Dataset Licence
+
+This project uses the **ADFA-LD** dataset (Australian Defence Force Academy — Linux Dataset).
+ADFA-LD was created by Creech & Hu (2013) at UNSW Canberra and is freely available for
+non-commercial academic research.  Please cite the original paper when using this dataset:
+
+> G. Creech and J. Hu, "Generation of a New IDS Test Dataset: Time to Retire the KDD
+> Collection," *IEEE WCNC*, 2013.
 
 ## Notes on Protocol and Leakage Safety
 

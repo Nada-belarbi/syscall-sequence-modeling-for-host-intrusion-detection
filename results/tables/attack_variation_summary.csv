@@ -1,0 +1,8 @@
+Finding,Value,Detail
+Hardest attack family (LSTM),Adduser,Recall = 0.57
+Hardest attack family (RF-TF-IDF),Adduser,Recall = 0.64
+LSTM F1 drop — delete 10%,-0.0051,F1 = 0.5511
+LSTM F1 drop — substitute 5%,-0.0097,F1 = 0.5465
+Prediction stability (both perturbations),97.3%,Proportion of traces with unchanged prediction
+LSTM best model (test F1),lstm_post_e128_h128_d0.1,F1=0.5772  Recall=0.8606  Precision=0.4343
+Best baseline (test F1),rf_tfidf,F1=0.5554  Recall=0.9273  Precision=0.3964

@@ -20,7 +20,7 @@ from src.evaluate import build_prediction_frame, evaluate_lstm_classifier
 from src.lstm_model import LSTMClassifier
 from src.metrics import save_confusion_matrix_plot
 from src.train import fit_lstm
-from src.utils import RESULTS_ROOT, PROCESSED_ROOT, ensure_dir, set_seed
+from src.utils import RESULTS_ROOT, PROCESSED_ROOT, append_experiment_log, ensure_dir, set_seed
 
 
 def build_split_pack(index_df: pd.DataFrame, seq_post: np.ndarray, seq_pre: np.ndarray, view_name: str) -> dict[str, dict[str, object]]:
@@ -97,6 +97,7 @@ def main() -> None:
         cfg = yaml.safe_load(f)
 
     seed = int(cfg.get("project", {}).get("seed", 42))
+    protocol_name = str(cfg.get("protocols", {}).get("main", {}).get("name", "protocol_a_main"))
     set_seed(seed)
     torch.manual_seed(seed)
 
@@ -120,17 +121,27 @@ def main() -> None:
     batch_size = int(training_cfg.get("batch_size", 64))
     num_workers = int(training_cfg.get("num_workers", 0))
 
-    views = ["post", "pre"]
+    lstm_cfg = cfg.get("lstm", {})
+    views = lstm_cfg.get("views", ["post", "pre"])
+    ablation_cfg = lstm_cfg.get("ablation", {})
+    emb_dims  = ablation_cfg.get("embedding_dims", [64, 128])
+    hid_sizes = ablation_cfg.get("hidden_sizes", [128, 256])
+    dropouts  = ablation_cfg.get("dropouts", [0.1, 0.3, 0.5])
     ablation_configs = [
-        {"embedding_dim": 32, "hidden_size": 64, "dropout": 0.1},
-        {"embedding_dim": 64, "hidden_size": 64, "dropout": 0.1},
-        {"embedding_dim": 32, "hidden_size": 128, "dropout": 0.1},
-        {"embedding_dim": 32, "hidden_size": 64, "dropout": 0.3},
+        {"embedding_dim": e, "hidden_size": h, "dropout": d}
+        for e in emb_dims
+        for h in hid_sizes
+        for d in dropouts
     ]
 
-    num_epochs = 1
-    lr = 1e-3
-    weight_decay = 1e-4
+    model_cfg   = lstm_cfg.get("model", {})
+    bidirectional  = bool(model_cfg.get("bidirectional", True))
+    use_attention  = bool(model_cfg.get("use_attention", True))
+    num_layers_cfg = int(model_cfg.get("num_layers", 2))
+
+    num_epochs   = int(lstm_cfg.get("num_epochs", 20))
+    lr           = float(training_cfg.get("lr", 1e-3))
+    weight_decay = float(training_cfg.get("weight_decay", 1e-4))
 
     ckpt_dir = ensure_dir(RESULTS_ROOT / "logs" / "checkpoints")
     tables_dir = ensure_dir(RESULTS_ROOT / "tables")
@@ -168,9 +179,11 @@ def main() -> None:
                 vocab_size=vocab_size,
                 embedding_dim=emb_dim,
                 hidden_size=hid_size,
-                num_layers=1,
+                num_layers=num_layers_cfg,
                 dropout=dropout,
                 padding_idx=pad_value,
+                bidirectional=bidirectional,
+                use_attention=use_attention,
             )
 
             history, _ = fit_lstm(
@@ -182,8 +195,8 @@ def main() -> None:
                 weight_decay=weight_decay,
                 device=device,
                 checkpoint_path=ckpt_path,
-                grad_clip=1.0,
-                early_stopping_patience=2,
+                grad_clip=float(training_cfg.get("grad_clip", 1.0)),
+                early_stopping_patience=int(training_cfg.get("early_stopping_patience", 5)),
             )
             if history:
                 history_rows.append(pd.DataFrame(history).assign(run_name=run_name))
@@ -218,6 +231,35 @@ def main() -> None:
                 }
             )
 
+            run_params = {
+                "view": view_name,
+                "embedding_dim": emb_dim,
+                "hidden_size": hid_size,
+                "dropout": dropout,
+                "num_layers": num_layers_cfg,
+                "bidirectional": bidirectional,
+                "use_attention": use_attention,
+                "num_epochs": num_epochs,
+                "lr": lr,
+                "weight_decay": weight_decay,
+            }
+            append_experiment_log(
+                run_name=run_name,
+                protocol=protocol_name,
+                split="val",
+                model="lstm",
+                params=run_params,
+                metrics=val_eval["metrics"],
+            )
+            append_experiment_log(
+                run_name=run_name,
+                protocol=protocol_name,
+                split="test",
+                model="lstm",
+                params=run_params,
+                metrics=test_eval["metrics"],
+            )
+
             val_f1 = float(val_eval["metrics"]["f1"])
             if val_f1 > best_val_f1:
                 best_val_f1 = val_f1
@@ -245,9 +287,11 @@ def main() -> None:
         vocab_size=vocab_size,
         embedding_dim=int(best_run["embedding_dim"]),
         hidden_size=int(best_run["hidden_size"]),
-        num_layers=1,
+        num_layers=num_layers_cfg,
         dropout=float(best_run["dropout"]),
         padding_idx=pad_value,
+        bidirectional=bidirectional,
+        use_attention=use_attention,
     )
     best_ckpt = torch.load(best_run["checkpoint_path"], map_location=device)
     best_model.load_state_dict(best_ckpt["model_state_dict"])
@@ -294,7 +338,7 @@ def main() -> None:
         "embedding_dim": int(best_run["embedding_dim"]),
         "hidden_size": int(best_run["hidden_size"]),
         "dropout": float(best_run["dropout"]),
-        "checkpoint_path": str(best_run["checkpoint_path"]),
+        "checkpoint_path": str(Path(best_run["checkpoint_path"]).relative_to(PROJECT_ROOT)),
     }
     best_summary_row.update({f"val_{k}": v for k, v in best_run["val_eval"]["metrics"].items()})
     best_summary_row.update({f"test_{k}": v for k, v in best_run["test_eval"]["metrics"].items()})
