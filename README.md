@@ -49,9 +49,20 @@ This repository implements an end-to-end intrusion detection pipeline on ADFA-LD
 
 From repository root (`syscall-anomaly-detection`):
 
+Windows (PowerShell):
+
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
+pip install -U pip
+pip install numpy pandas scipy scikit-learn matplotlib seaborn pyarrow pyyaml torch tqdm jupyter
+```
+
+Linux / macOS (bash/zsh):
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -U pip
 pip install numpy pandas scipy scikit-learn matplotlib seaborn pyarrow pyyaml torch tqdm jupyter
 ```
