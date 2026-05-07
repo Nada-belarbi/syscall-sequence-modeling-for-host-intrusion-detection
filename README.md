@@ -24,22 +24,8 @@ The pipeline includes:
 - robustness evaluation under syscall perturbations,
 - reproducible experiment configuration and CI validation.
 
-Main findings show that Random Forest models achieve stronger global ranking performance (ROC-AUC and PR-AUC), while the BiLSTM achieves the best threshold-tuned F1-score and better robustness on long syscall traces.## Overview
-
-This repository presents a research-oriented host-based intrusion detection pipeline using Linux system call sequences from the ADFA-LD dataset.
-
-The project compares classical frequency-based machine learning baselines (Logistic Regression and Random Forest on BoW/TF-IDF/bigrams) against a Bidirectional LSTM with attention pooling under a leakage-safe scenario-based evaluation protocol.
-
-The pipeline includes:
-- dataset auditing and SHA-1 leakage detection,
-- train-only feature fitting,
-- threshold optimization,
-- class imbalance handling,
-- attack-family and sequence-length error analysis,
-- robustness evaluation under syscall perturbations,
-- reproducible experiment configuration and CI validation.
-
 Main findings show that Random Forest models achieve stronger global ranking performance (ROC-AUC and PR-AUC), while the BiLSTM achieves the best threshold-tuned F1-score and better robustness on long syscall traces.
+
 ## Key Results
 
 | Model | F1 | ROC-AUC | PR-AUC | Recall | FNR |
