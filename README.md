@@ -1,6 +1,6 @@
-# System Call-Based Intrusion Detection with Sequence Modeling on ADFA-LD
+# Syscall Anomaly Detection on ADFA-LD
 
-[![CI](https://github.com/Nada-belarbi/test/actions/workflows/ci.yml/badge.svg)](https://github.com/Nada-belarbi/test/actions/workflows/ci.yml)
+[![CI](https://github.com/Nada-belarbi/syscall-sequence-modeling-for-host-intrusion-detection/actions/workflows/ci.yml/badge.svg)](https://github.com/Nada-belarbi/syscall-anomaly-detection-adfa-ld/actions/workflows/ci.yml)
 
 This repository implements an end-to-end intrusion detection pipeline on ADFA-LD using:
 
@@ -8,8 +8,77 @@ This repository implements an end-to-end intrusion detection pipeline on ADFA-LD
 - Sequential model: LSTM with pre/post truncation ablation and hyperparameter checks.
 - Error analysis: false positives/false negatives, scenario/family breakdown, length effects, imbalance effects.
 - Robustness checks: local syscall deletion and light substitution noise.
+  
+## Overview
 
-## Project Structure
+This repository presents a research-oriented host-based intrusion detection pipeline using Linux system call sequences from the ADFA-LD dataset.
+
+The project compares classical frequency-based machine learning baselines (Logistic Regression and Random Forest on BoW/TF-IDF/bigrams) against a Bidirectional LSTM with attention pooling under a leakage-safe scenario-based evaluation protocol.
+
+The pipeline includes:
+- dataset auditing and SHA-1 leakage detection,
+- train-only feature fitting,
+- threshold optimization,
+- class imbalance handling,
+- attack-family and sequence-length error analysis,
+- robustness evaluation under syscall perturbations,
+- reproducible experiment configuration and CI validation.
+
+Main findings show that Random Forest models achieve stronger global ranking performance (ROC-AUC and PR-AUC), while the BiLSTM achieves the best threshold-tuned F1-score and better robustness on long syscall traces.## Overview
+
+This repository presents a research-oriented host-based intrusion detection pipeline using Linux system call sequences from the ADFA-LD dataset.
+
+The project compares classical frequency-based machine learning baselines (Logistic Regression and Random Forest on BoW/TF-IDF/bigrams) against a Bidirectional LSTM with attention pooling under a leakage-safe scenario-based evaluation protocol.
+
+The pipeline includes:
+- dataset auditing and SHA-1 leakage detection,
+- train-only feature fitting,
+- threshold optimization,
+- class imbalance handling,
+- attack-family and sequence-length error analysis,
+- robustness evaluation under syscall perturbations,
+- reproducible experiment configuration and CI validation.
+
+Main findings show that Random Forest models achieve stronger global ranking performance (ROC-AUC and PR-AUC), while the BiLSTM achieves the best threshold-tuned F1-score and better robustness on long syscall traces.
+## Key Results
+
+| Model | F1 | ROC-AUC | PR-AUC | Recall | FNR |
+|---|---:|---:|---:|---:|---:|
+| BiLSTM + Attention | 0.577 | 0.890 | 0.455 | 0.861 | 0.139 |
+| RF-BoW | 0.555 | 0.931 | 0.677 | 0.903 | 0.097 |
+| RF-TF-IDF | 0.555 | 0.929 | 0.641 | 0.927 | 0.073 |
+
+Main observations:
+- Random Forest models provide stronger ranking capability and lower false negative rates.
+- The BiLSTM achieves the highest threshold-tuned F1-score.
+- Frequency-based representations remain highly competitive on ADFA-LD.
+- Sequence-aware modeling provides complementary advantages on long traces and under perturbations.
+## Implemented Methods
+
+### Classical Baselines
+- Logistic Regression
+- Random Forest
+- Bag-of-Words features
+- TF-IDF features
+- Bigram frequency encoding
+
+### Sequential Deep Learning
+- Bidirectional LSTM
+- Attention pooling
+- Packed padded sequences
+- Weighted sampling
+- Positive class weighting
+- Threshold optimization
+
+### Evaluation and Analysis
+- ROC-AUC / PR-AUC analysis
+- Attack-family breakdown
+- Sequence-length analysis
+- False positive / false negative analysis
+- Robustness under syscall deletion and substitution perturbations
+
+  
+Project Structure
 
 - `configs/default.yaml`: frozen default experiment configuration.
 - `data/raw/adfa-ld/ADFA-LD`: raw dataset.
